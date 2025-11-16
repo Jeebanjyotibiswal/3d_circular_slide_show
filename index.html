@@ -1,0 +1,361 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <title>Project Showcase - 3D Carousel (Medium Size)</title>
+  <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.4.0/css/all.min.css">
+  <style>
+    * { margin: 0; padding: 0; box-sizing: border-box; font-family: 'Segoe UI', Tahoma, Geneva, Verdana, sans-serif; }
+    body {
+      background: linear-gradient(135deg, #0f172a 0%, #1e293b 100%);
+      min-height: 100vh;
+      display: flex;
+      flex-direction: column;
+    }
+    .header {
+      text-align: center;
+      margin-top: 2rem;
+      margin-bottom: 1rem;
+    }
+    .tagline {
+      font-size: 2rem;
+      font-weight: 700;
+      margin-bottom: 1rem;
+      background: linear-gradient(to right, #10b981, #8b5cf6);
+      -webkit-background-clip: text;
+      -webkit-text-fill-color: transparent;
+      text-shadow: 0 2px 10px rgba(16, 185, 129, 0.3);
+    }
+    .subtitle {
+      font-size: 1rem;
+      color: #cbd5e1;
+      margin-bottom: 1.2rem;
+      line-height: 1.6;
+    }
+    .main-content {
+      flex: 1;
+      display: flex;
+      align-items: center;
+      justify-content: center;
+      width: 100%;
+      padding-bottom: 2rem;
+    }
+    .slider-container {
+      width: 100%;
+      max-width: 750px;   /* medium width */
+      height: 360px;      /* medium height */
+      display: flex;
+      justify-content: center;
+      align-items: center;
+      perspective: 900px; /* less depth for softer 3D */
+      position: relative;
+    }
+    .carousel {
+      position: relative;
+      width: 100%;
+      height: 100%;
+      transform-style: preserve-3d;
+      transition: transform 1s cubic-bezier(0.25, 0.46, 0.45, 0.94);
+      left: 50%;
+    }
+    .card {
+      position: absolute;
+      width: 220px; /* smaller width */
+      height: 310px; /* smaller height */
+      border-radius: 14px;
+      overflow: hidden;
+      box-shadow: 0 14px 30px rgba(0,0,0,0.28);
+      transform-style: preserve-3d;
+      border: none;
+      cursor: pointer;
+      top: 50%;
+      left: 50%;
+      margin-left: -110px;
+      margin-top: -155px;
+      transition: 
+          opacity 0.6s,
+          filter 0.6s,
+          z-index 0.2s,
+          box-shadow 0.2s;
+      background: rgba(30,41,59,0.96);
+      border: 1px solid rgba(75,85,99,0.18);
+      backdrop-filter: blur(6px);
+    }
+    .card-content { 
+      position: relative; width: 100%; height: 100%;
+      background: transparent;
+      border-radius: 14px;
+      overflow: hidden;
+      transition: border 0.3s, box-shadow 0.3s;
+    }
+    .card:hover {
+      box-shadow: 0 24px 50px rgba(16,185,129,0.16);
+      border-color: #10b98199;
+    }
+    .card-image {
+      position: relative;
+      height: 120px;
+      overflow: hidden;
+    }
+    .card-image img {
+      width: 100%;
+      height: 100%;
+      object-fit: cover;
+      transition: transform 0.5s;
+    }
+    .card-image::after {
+      content: '';
+      position: absolute;
+      inset: 0;
+      background: linear-gradient(to top, rgba(15,23,42,0.7) 0%, transparent 100%);
+    }
+    .external-link {
+      position: absolute; top: 10px; left: 10px;
+      z-index: 20; width: 28px; height: 28px; border-radius: 50%; background: #ea580c;
+      display: flex; align-items: center; justify-content: center; color: white;
+      text-decoration: none; font-size: 1rem;
+      border: 1px solid #ffffff33;
+      box-shadow: 0 3px 8px rgba(0,0,0,0.19);
+      transition: all 0.3s;
+    }
+    .external-link:hover { background: #10b981; }
+    .year-badge {
+      position: absolute; top: 10px; right: 10px;
+      background: linear-gradient(to right, #10b981, #8b5cf6);
+      color: #fff; padding: 0.22rem 0.65rem; border-radius: 14px; font-size: 0.75rem; font-weight: 500;
+    }
+    .category-badge {
+      position: absolute; bottom: 10px; left: 10px;
+      background: #182337d9; color: #10b981;
+      padding: 0.22rem 0.7rem; border-radius: 14px; font-size: 0.75rem; font-weight: 600;
+      border: 1px solid rgba(16,185,129,0.17);
+    }
+    .card-body { padding: 1rem; height: 170px; display: flex; flex-direction: column; justify-content: space-between;}
+    .card-header { display: flex; justify-content: space-between; align-items: center; margin-bottom: 0.5rem; }
+    .card-org  { color: #94a3b8; font-size: 0.78rem; font-weight: 500;}
+    .card-date { display: flex; align-items: center; gap: 0.25rem; color: #94a3b8; font-size: 0.74rem;}
+    .card-title { font-size: 1.1rem; font-weight: 700; color: white; margin-bottom: 0.6rem;}
+    .card-description { color: #cbd5e1; font-size: 0.87rem; line-height: 1.4; margin-bottom: 0.6rem; }
+    .card-tags { display: flex; flex-wrap: wrap; gap: 0.3rem; margin-bottom: 0.6rem;}
+    .card-tag { background: #223043cc; color: #cbd5e1; padding: 0.14rem 0.48rem; border-radius: 12px; font-size: 0.70rem; border: 1px solid #45587333; font-weight: 500; }
+    .card-footer { display: flex; justify-content: space-between; align-items: center;}
+    .details-link { color: #10b981; text-decoration: none; font-size: 0.81rem; font-weight: 600; }
+    .details-link:hover { color: #34d399; }
+    .buttons {
+      position: absolute; top: 50%; width: 100%; display: flex; justify-content: space-between;
+      transform: translateY(-50%); z-index: 20; padding: 0 1rem;
+      pointer-events: none;
+    }
+    .btn {
+      background: #10b981f2; border: none; width: 40px; height: 40px; border-radius: 50%; cursor: pointer;
+      font-weight: bold; color: white; box-shadow: 0 2px 9px #10b9812a;
+      transition: all 0.25s; font-size: 1rem; pointer-events: all;
+      display: flex; align-items: center; justify-content: center;
+    }
+    .btn:hover { background: #08a173; }
+    .indicators { display: flex; justify-content: center; gap: 0.5rem; margin-top: 1.5rem;}
+    .indicator { width: 10px; height: 10px; border-radius: 50%; background: #10b98133; cursor: pointer; transition: all 0.25s;}
+    .indicator.active { background: #10b981; transform: scale(1.2);}
+    .footer { margin-top: 1rem; text-align: center; color: #94a3b8; font-size: 0.84rem; }
+    @media (max-width: 600px) {
+      .slider-container { max-width: 95vw; height: 260px;}
+      .card { width: 150px; height: 210px; margin-left: -75px; margin-top: -105px;}
+      .card-title { font-size: 0.94rem;}
+      .card-description { font-size: 0.76rem;}
+      .card-tag { font-size: 0.63rem;}
+      .main-content { padding-bottom: 1rem; }
+    }
+  </style>
+</head>
+<body>
+  <div class="header">
+    <h1 class="tagline">Project <span style="color:#10b981;">Showcase</span></h1>
+    <p class="subtitle">Explore our portfolio of cutting-edge projects in an immersive 3D experience.</p>
+  </div>
+  <div class="main-content">
+    <div class="slider-container">
+      <div class="carousel" id="carousel"></div>
+      <div class="buttons">
+        <button class="btn" id="prev"><i class="fas fa-chevron-left"></i></button>
+        <button class="btn" id="next"><i class="fas fa-chevron-right"></i></button>
+      </div>
+    </div>
+  </div>
+  <div class="indicators" id="indicators"></div>
+  <div class="footer">
+    <p>Infinity Rehab & Wellness © 2024 | Providing Excellence in Healthcare</p>
+  </div>
+<script>
+  const carousel = document.getElementById('carousel');
+  const indicatorsContainer = document.getElementById('indicators');
+  const cardsData = [
+    {
+      id: 1,
+      title: "Infinity Rehab Website",
+      org: "Infinity Rehab & Wellness",
+      description: "Professional physiotherapy and rehabilitation website offering personalized treatment programs and online appointment booking.",
+      year: "2024",
+      category: "Healthcare Website",
+      tags: ["HTML", "CSS", "JavaScript", "React"],
+      link: "https://infinityrehab.in",
+      image: "https://images.unsplash.com/photo-1576091160399-112ba8d25d1f?ixlib=rb-4.0.3&ixid=M3wxMjA3fDB8MHxwaG90by1wYWdlfHx8fGVufDB8fHx8fA%3D%3D&auto=format&fit=crop&w=1170&q=80"
+    },
+    {
+      id: 2,
+      title: "Stroke Rehabilitation Program",
+      org: "Infinity Rehab & Wellness",
+      description: "Specialized stroke rehabilitation program with advanced neurological recovery techniques and personalized care plans.",
+      year: "2024",
+      category: "Stroke Care",
+      tags: ["Therapy", "Neurology", "Recovery"],
+      link: "#",
+      image: "https://images.unsplash.com/photo-1559757148-5c350d0d3c56?ixlib=rb-4.0.3&ixid=M3wxMjA3fDB8MHxwaG90by1wYWdlfHx8fGVufDB8fHx8fA%3D%3D&auto=format&fit=crop&w=1170&q=80"
+    },
+    {
+      id: 3,
+      title: "Physiotherapy Services",
+      org: "Infinity Rehab & Wellness",
+      description: "Comprehensive physiotherapy services for injury recovery, pain management, and mobility improvement.",
+      year: "2024",
+      category: "Physical Therapy",
+      tags: ["Mobility", "Pain Relief", "Exercise"],
+      link: "#",
+      image: "https://images.unsplash.com/photo-1571019613454-1cb2f99b2d8b?ixlib=rb-4.0.3&ixid=M3wxMjA3fDB8MHxwaG90by1wYWdlfHx8fGVufDB8fHx8fA%3D%3D&auto=format&fit=crop&w=1170&q=80"
+    },
+    {
+      id: 4,
+      title: "Wellness Programs",
+      org: "Infinity Rehab & Wellness",
+      description: "Holistic wellness programs focusing on preventive care, nutrition, and lifestyle management.",
+      year: "2024",
+      category: "Preventive Care",
+      tags: ["Nutrition", "Lifestyle", "Prevention"],
+      link: "#",
+      image: "https://images.unsplash.com/photo-1506126613408-eca07ce68773?ixlib=rb-4.0.3&ixid=M3wxMjA3fDB8MHxwaG90by1wYWdlfHx8fGVufDB8fHx8fA%3D%3D&auto=format&fit=crop&w=1099&q=80"
+    },
+    {
+      id: 5,
+      title: "Telemedicine Platform",
+      org: "Infinity Rehab & Wellness",
+      description: "Advanced telemedicine platform for remote consultations and virtual therapy sessions.",
+      year: "2024",
+      category: "Digital Health",
+      tags: ["Telehealth", "Virtual Care", "Technology"],
+      link: "#",
+      image: "https://images.unsplash.com/photo-1586773860418-d37222d8fce3?ixlib=rb-4.0.3&ixid=M3wxMjA3fDB8MHxwaG90by1wYWdlfHx8fGVufDB8fHx8fA%3D%3D&auto=format&fit=crop&w=1173&q=80"
+    },
+    {
+      id: 6,
+      title: "Cardiac Rehabilitation",
+      org: "Infinity Rehab & Wellness",
+      description: "Specialized cardiac rehabilitation program for heart health recovery and cardiovascular conditioning.",
+      year: "2024",
+      category: "Cardiac Care",
+      tags: ["Heart Health", "Exercise", "Monitoring"],
+      link: "#",
+      image: "https://images.unsplash.com/photo-1559757175-0eb30cd8c063?ixlib=rb-4.0.3&ixid=M3wxMjA3fDB8MHxwaG90by1wYWdlfHx8fGVufDB8fHx8fA%3D%3D&auto=format&fit=crop&w=1170&q=80"
+    }
+  ];
+  let currentIndex = 0;
+  const totalCards = cardsData.length;
+  const radius = 270; // reduces circle size
+  const angleStep = 360 / totalCards;
+  let carouselAngle = 0;
+
+  function createCards() {
+    carousel.innerHTML = '';
+    indicatorsContainer.innerHTML = '';
+    for (let i = 0; i < totalCards; i++) {
+      const card = document.createElement('div');
+      card.className = 'card';
+      const angle = i * angleStep;
+      card.style.transform = `rotateY(${angle}deg) translateZ(${radius}px)`;
+      card.innerHTML = `
+        <div class="card-content">
+          <div class="card-image">
+            <img src="${cardsData[i].image}" alt="${cardsData[i].title}">
+            <a href="${cardsData[i].link}" target="_blank" class="external-link">
+              <i class="fas fa-external-link-alt"></i>
+            </a>
+            <div class="year-badge">${cardsData[i].year}</div>
+            <div class="category-badge">${cardsData[i].category}</div>
+          </div>
+          <div class="card-body">
+            <div>
+              <div class="card-header">
+                <span class="card-org">${cardsData[i].org}</span>
+                <div class="card-date">
+                  <i class="far fa-calendar"></i>
+                  <span>${cardsData[i].year}</span>
+                </div>
+              </div>
+              <h3 class="card-title">${cardsData[i].title}</h3>
+              <p class="card-description">${cardsData[i].description}</p>
+            </div>
+            <div>
+              <div class="card-tags">
+                ${cardsData[i].tags.map(tag => `<span class="card-tag">${tag}</span>`).join('')}
+              </div>
+              <div class="card-footer">
+                <a class="details-link" href="/projects/${cardsData[i].id}">View Details →</a>
+              </div>
+            </div>
+          </div>
+        </div>
+      `;
+      carousel.appendChild(card);
+      // Indicator
+      const indicator = document.createElement('div');
+      indicator.className = 'indicator';
+      if (i === currentIndex) indicator.classList.add('active');
+      indicator.addEventListener('click', () => {
+        rotateToIndex(i);
+        resetAutoRotate();
+      });
+      indicatorsContainer.appendChild(indicator);
+    }
+  }
+  function updateCarouselRotation() {
+    carousel.style.transform = `translateX(-50%) rotateY(${carouselAngle}deg)`;
+    document.querySelectorAll('.indicator').forEach((el, idx) => {
+      el.classList.toggle('active', idx === currentIndex);
+    });
+  }
+  function rotateToIndex(targetIndex) {
+    let diff = targetIndex - currentIndex;
+    if (Math.abs(diff) > totalCards/2) {
+      diff = -Math.sign(diff) * (totalCards - Math.abs(diff));
+    }
+    carouselAngle -= diff * angleStep;
+    currentIndex = targetIndex;
+    updateCarouselRotation();
+  }
+  function rotateCards(direction) {
+    if (direction === 'next') {
+      currentIndex = (currentIndex + 1) % totalCards;
+      carouselAngle -= angleStep;
+    } else {
+      currentIndex = (currentIndex - 1 + totalCards) % totalCards;
+      carouselAngle += angleStep;
+    }
+    updateCarouselRotation();
+  }
+  let autoRotate = setInterval(() => rotateCards('next'), 5000);
+  function resetAutoRotate() {
+    clearInterval(autoRotate);
+    autoRotate = setInterval(() => rotateCards('next'), 5000);
+  }
+  document.getElementById('next').addEventListener('click', () => {
+    rotateCards('next');
+    resetAutoRotate();
+  });
+  document.getElementById('prev').addEventListener('click', () => {
+    rotateCards('prev');
+    resetAutoRotate();
+  });
+  createCards();
+  updateCarouselRotation();
+</script>
+</body>
+</html>
